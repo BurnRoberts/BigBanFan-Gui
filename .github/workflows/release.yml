@@ -114,11 +114,12 @@ jobs:
             -ldflags "-X 'main.version=${{ github.ref_name }}'" \
             -o bigbanfan-gui-macos
 
-      # Wails produces a .app bundle (directory). Zip it for distribution.
+      # Wails names the .app bundle from wails.json outputfilename, not the -o flag.
+      # Use *.app wildcard to capture it regardless of the name.
       - name: Zip macOS bundle
         run: |
           cd build/bin
-          zip -r bigbanfan-gui-macos-universal.zip bigbanfan-gui-macos.app
+          zip -r bigbanfan-gui-macos-universal.zip *.app
 
       - uses: actions/upload-artifact@v4
         with:
