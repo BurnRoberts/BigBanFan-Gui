@@ -21,10 +21,10 @@ var icon []byte
 
 // version is injected at build time via:
 //
-//	-ldflags "-X 'main.version=v1.0.0'"
+//	-ldflags "-X 'main.version=v1.0.1'"
 //
 // Update this value when cutting a new release.
-var version = "v1.0.0"
+var version = "v1.0.1"
 
 func main() {
 	app := NewApp()
