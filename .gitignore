@@ -1,0 +1,51 @@
+# ── Wails build output ────────────────────────────────
+build/bin/
+frontend/dist/
+
+# ── Go ────────────────────────────────────────────────
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/vendor/
+
+# ── Frontend / Node ───────────────────────────────────
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── IDE / Editor ──────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Temp / agent artifacts ────────────────────────────
+*.out.txt
+*.err.txt
+*.run.txt
+*.cde.txt
+*.pid.txt
+*.time.txt
+
+# Private / agent-only (not for public repo)
+MEMORY.md
+GEMINI.md
+MGMT_API.md
+.vscode/
+.agent/
+build.sh
+# Raw source banner is large; assets/icon.png and assets/gui_banner.png ARE tracked
+assets/banner.png
