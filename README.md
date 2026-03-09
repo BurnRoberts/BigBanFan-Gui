@@ -178,4 +178,4 @@ Live log stream from the node with configurable severity filter. Log lines are c
 
 ## License
 
-MIT. See [LICENSE](LICENSE)
+MIT.

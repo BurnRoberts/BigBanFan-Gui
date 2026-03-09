@@ -179,6 +179,7 @@ func (c *Client) Connect(profile connection.Profile) error {
 	myID := c.connID.Add(1) // unique ID for this connection's readLoop
 
 	go c.readLoop(myID)
+	go c.keepalive(myID)
 
 	runtime.EventsEmit(c.ctx, "connection:up", profile.Host)
 	return nil
@@ -335,6 +336,34 @@ func (c *Client) UnsubscribeLogs() error {
 	return c.send(&wireMsg{Type: "LOG_UNSUBSCRIBE", Ts: now()})
 }
 
+// ── Keepalive ─────────────────────────────────────────────────────────────────
+
+// keepalive sends a STATUS request every 60 seconds while the connection with
+// the given connID is active. This prevents the 120s read deadline in readLoop
+// from firing during idle periods (e.g. quiet log streams with no push events).
+// The goroutine exits automatically when the connection is replaced or closed.
+func (c *Client) keepalive(myConnID int64) {
+	ticker := time.NewTicker(60 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			// Stop if this connection is no longer the active one.
+			if c.connID.Load() != myConnID {
+				return
+			}
+			// Best-effort STATUS ping — ignore result; the response goes
+			// through readLoop normally which refreshes the read deadline.
+			if _, err := c.GetStatus(); err != nil {
+				// Connection is dead; readLoop will handle cleanup.
+				return
+			}
+		case <-c.ctx.Done():
+			return
+		}
+	}
+}
+
 // ── Read loop (push event router) ────────────────────────────────────────────
 
 // readLoop continuously reads and dispatches incoming frames.
@@ -358,9 +387,10 @@ func (c *Client) readLoop(myConnID int64) {
 		}
 
 		// Refresh read deadline before each frame. If the server drops the
-		// connection silently (TCP half-open), we detect it within 90s instead
-		// of hanging the goroutine indefinitely.
-		conn.SetReadDeadline(time.Now().Add(90 * time.Second)) //nolint:errcheck
+		// connection silently (TCP half-open), we detect it within 120s instead
+		// of hanging the goroutine indefinitely. The keepalive goroutine sends
+		// STATUS every 60s so the deadline is always refreshed during idle periods.
+		conn.SetReadDeadline(time.Now().Add(120 * time.Second)) //nolint:errcheck
 		raw, err := readFrame(conn, c.key)
 		if err != nil {
 			if c.connected.Load() {
