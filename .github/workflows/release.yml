@@ -47,6 +47,7 @@ jobs:
             -clean \
             -trimpath \
             -tags webkit2_4_1 \
+            -ldflags "-X 'main.version=${{ github.ref_name }}'" \
             -o bigbanfan-gui-linux-amd64
 
       - uses: actions/upload-artifact@v4
@@ -78,6 +79,7 @@ jobs:
             -platform windows/amd64 `
             -clean `
             -trimpath `
+            -ldflags "-X 'main.version=${{ github.ref_name }}'" `
             -o bigbanfan-gui-windows-amd64.exe
 
       - uses: actions/upload-artifact@v4
@@ -109,6 +111,7 @@ jobs:
             -platform darwin/universal \
             -clean \
             -trimpath \
+            -ldflags "-X 'main.version=${{ github.ref_name }}'" \
             -o bigbanfan-gui-macos
 
       # Wails produces a .app bundle (directory). Zip it for distribution.

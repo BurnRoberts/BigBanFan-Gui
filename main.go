@@ -19,11 +19,18 @@ var assets embed.FS
 //go:embed build/appicon.png
 var icon []byte
 
+// version is injected at build time via:
+//
+//	-ldflags "-X 'main.version=v1.0.0'"
+//
+// Update this value when cutting a new release.
+var version = "v1.0.0"
+
 func main() {
 	app := NewApp()
 
 	err := wails.Run(&options.App{
-		Title:            "BigBanFan",
+		Title:            "BigBanFan " + version,
 		Width:            1280,
 		Height:           820,
 		MinWidth:         900,
